@@ -1,5 +1,73 @@
-basePath: /api/v1
+basePath: /
+host: localhost:8080
 info:
-  contact: {}
-paths: {}
+  contact:
+    name: Atakan Demircioğlu
+    url: https://twitter.com/atakde
+  description: This is a sample server for a rest api go includes s3 and cloudfront
+    endpoints.
+  title: Rest API Go
+  version: "1.0"
+paths:
+  /delete-image:
+    delete:
+      parameters:
+      - description: key
+        in: query
+        name: key
+        required: true
+        type: string
+      - description: bucket
+        in: query
+        name: bucket
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update image from s3
+  /fetch-from-cloud-front:
+    get:
+      parameters:
+      - description: key
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Fetch image from cloudfront
+  /update-image:
+    put:
+      parameters:
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update image from s3
+  /upload-image:
+    post:
+      parameters:
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Upload image to s3
 swagger: "2.0"

@@ -9,6 +9,8 @@ import (
 	"os"
 	"time"
 
+	_ "rest-api-go/docs"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -17,69 +19,93 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	swaggerfiles "github.com/swaggo/files"
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var uploader *s3manager.Uploader
 
+// @title           Rest API Go
+// @version         1.0
+// @description     This is a sample server for a rest api go includes s3 and cloudfront endpoints.
+
+// @contact.name   Atakan Demircioğlu
+// @contact.url    https://twitter.com/atakde
+
+// @host      localhost:8080
+// @BasePath  /
+
 func main() {
 	LoadEnv()
+
 	r := gin.Default()
 
-	// @BasePath /api/v1
-
-	// PingExample godoc
-	// @Summary ping example
-	// @Schemes
-	// @Description do ping
-	// @Tags example
-	// @Accept json
-	// @Produce json
-	// @Success 200 {string} Helloworld
-	// @Router /example/helloworld [get]
-	r.GET("/fetch-from-cloud-front", func(c *gin.Context) {
-		key := c.Query("key")
-
-		cloudFrontDomain := GetEnvWithKey("CLOUD_FRONT_DOMAIN")
-		url := fmt.Sprintf("https://%s/%s", cloudFrontDomain, key)
-
-		c.JSON(200, gin.H{
-			"url": url,
-		})
-	})
-
-	r.POST("/upload-image", func(c *gin.Context) {
-		// set uploader
-		uploader = NewUploader()
-
-		res := upload(c)
-		c.JSON(200, gin.H{
-			"message": res,
-		})
-
-	})
-
-	r.PUT("/update-image", func(c *gin.Context) {
-		// set uploader
-		update(c)
-		c.JSON(200, gin.H{
-			"message": "updated",
-		})
-
-	})
-
-	r.DELETE("/delete-image", func(c *gin.Context) { // make it delete
-		key := c.Query("key")
-		bucket := c.Query("bucket")
-		deleteObject(key, bucket)
-
-		c.JSON(200, gin.H{
-			"message": "deleted",
-		})
-	})
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	r.GET("/fetch-from-cloud-front", cloudFrontFetchEndpoint)
+	r.POST("/upload-image", uploadEndpoint)
+	r.PUT("/update-image", updateEndpoint)
+	r.DELETE("/delete-image", deleteEndpoint)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Run() // listen and serve on 0.0.0.0:8080
+}
+
+// @Summary Upload image to s3
+// @Produce json
+// @Success 200
+// @Router /upload-image [post]
+// @Param file formData file true "file"
+func uploadEndpoint(c *gin.Context) {
+	// set uploader
+	uploader = NewUploader()
+
+	res := upload(c)
+	c.JSON(200, gin.H{
+		"message": res,
+	})
+}
+
+// @Summary Update image from s3
+// @Produce json
+// @Success 200
+// @Router /update-image [put]
+// @Param file formData file true "file"
+func updateEndpoint(c *gin.Context) {
+	// set uploader
+	update(c)
+	c.JSON(200, gin.H{
+		"message": "updated",
+	})
+}
+
+// @Summary Update image from s3
+// @Produce json
+// @Success 200
+// @Router /delete-image [delete]
+// @Param key query string true "key"
+// @Param bucket query string true "bucket"
+func deleteEndpoint(c *gin.Context) {
+	key := c.Query("key")
+	bucket := c.Query("bucket")
+	deleteObject(key, bucket)
+
+	c.JSON(200, gin.H{
+		"message": "deleted",
+	})
+}
+
+// @Summary Fetch image from cloudfront
+// @Produce json
+// @Success 200
+// @Router /fetch-from-cloud-front [get]
+// @Param key query string true "key"
+func cloudFrontFetchEndpoint(c *gin.Context) {
+	key := c.Query("key")
+
+	cloudFrontDomain := GetEnvWithKey("CLOUD_FRONT_DOMAIN")
+	url := fmt.Sprintf("https://%s/%s", cloudFrontDomain, key)
+
+	c.JSON(200, gin.H{
+		"url": url,
+	})
 }
 
 // GetEnvWithKey : get env value

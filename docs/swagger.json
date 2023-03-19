@@ -1,8 +1,111 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "This is a sample server for a rest api go includes s3 and cloudfront endpoints.",
+        "title": "Rest API Go",
+        "contact": {
+            "name": "Atakan Demircioğlu",
+            "url": "https://twitter.com/atakde"
+        },
+        "version": "1.0"
     },
-    "basePath": "/api/v1",
-    "paths": {}
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/delete-image": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update image from s3",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "key",
+                        "name": "key",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "bucket",
+                        "name": "bucket",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/fetch-from-cloud-front": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Fetch image from cloudfront",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "key",
+                        "name": "key",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/update-image": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update image from s3",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/upload-image": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Upload image to s3",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    }
 }
